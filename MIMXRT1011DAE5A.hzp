@@ -1,0 +1,68 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="MIMXRT1011DAE5A" target="8" version="2">
+  <configuration
+    Name="Debug"
+    c_preprocessor_definitions="DEBUG"
+    gcc_debugging_level="Level 3"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="None"
+    hidden="Yes" />
+  <configuration
+    Name="Release"
+    c_preprocessor_definitions="NDEBUG"
+    gcc_debugging_level="None"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="Level 1"
+    hidden="Yes" />
+  <configuration
+    Name="THUMB"
+    Platform="ARM"
+    arm_instruction_set="Thumb"
+    arm_library_instruction_set="Thumb"
+    c_preprocessor_definitions="__THUMB"
+    hidden="Yes" />
+  <configuration Name="THUMB Debug" inherited_configurations="THUMB;Debug" />
+  <configuration
+    Name="THUMB Release"
+    inherited_configurations="THUMB;Release" />
+  <project Name="MIMXRT1011DAE5A">
+    <configuration
+      CMSIS_CORE="Yes"
+      Name="Common"
+      Placement="TCM"
+      Target="MIMXRT1011DAE5A"
+      arm_architecture="v7EM"
+      arm_core_type="Cortex-M7"
+      arm_fpu_abi="Hard"
+      arm_fpu_type="FPv5-SP-D16"
+      arm_linker_heap_size="1024"
+      arm_linker_stack_size="1024"
+      arm_target_device_name="MIMXRT1011xxx5A"
+      arm_target_interface_type="SWD"
+      arm_target_loader_applicable_loaders=""
+      arm_target_loader_default_loader=""
+      c_user_include_directories="$(ProjectDir)/yss/inc;$(ProjectDir)/app/inc"
+      debug_register_definition_file="$(TargetsDir)/iMXRT/XML/MIMXRT1011_registers.xml"
+      link_symbol_definitions="__NCACHE_REGION_START=__NCACHE_REGION_segment_start__;__NCACHE_REGION_SIZE=__NCACHE_REGION_segment_size__;__base_NCACHE_REGION=__NCACHE_REGION_segment_start__;__top_NCACHE_REGION=__NCACHE_REGION_segment_end__"
+      linker_memory_map_file="$(TargetsDir)/iMXRT/iMXRT_MemoryMap.xml"
+      linker_memory_map_macros="OCRAMSIZE=0x10000;DTCMSIZE=0x8000;ITCMSIZE=0x8000"
+      linker_section_placement_file="$(StudioDir)/targets/Cortex_M/tcm_placement.xml"
+      macros="DeviceStartFile=$(TargetsDir)/iMXRT/startup_MIMXRT1011.s;DeviceSystemFile=$(TargetsDir)/iMXRT/devices/MIMXRT1011/system_MIMXRT1011.c;;QSPI=MIMXRT1011_QuadSPI_4KB_SEC;DeviceFamily=MIMXRT1011"
+      project_directory=""
+      project_type="Executable"
+      property_groups_file_path="$(TargetsDir)/iMXRT/propertyGroups.xml"
+      target_reset_script="Reset()"
+      target_script_file="$(TargetsDir)/iMXRT/iMXRT_Target.js" />
+    <configuration Name="Flash" arm_target_loader_parameter="24000000" />
+    <folder Name="Source Files">
+      <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc" />
+      <folder Name="app" exclude="" filter="" path="app" recurse="Yes" />
+      <folder Name="yss" exclude="" filter="" path="yss" recurse="Yes" />
+    </folder>
+    <folder Name="System Files">
+      <file file_name="$(DeviceStartFile)" />
+      <file file_name="$(DeviceSystemFile)" />
+      <file file_name="$(StudioDir)/source/thumb_crt0.s" />
+    </folder>
+  </project>
+</solution>
