@@ -57,6 +57,16 @@ typedef GPIO_TypeDef			YSS_GPIO_Peri;
 typedef GPIO_TypeDef			YSS_GPIO_Peri;
 #define GpioTargetHeaderFile	<targets/st/class_gpio_stm32.h>
 
+#elif defined(W7500)
+
+typedef GPIO_TypeDef			YSS_GPIO_Peri;
+#define GpioTargetHeaderFile	<targets/wiznet/class_gpio_w7500x.h>
+
+#elif defined(CPU_MIMXRT1011DAE5A)
+
+typedef GPIO_Type				YSS_GPIO_Peri;
+#define GpioTargetHeaderFile	<targets/nxp/class_gpio_mimxrt.h>
+
 #else
 
 typedef volatile uint32_t		YSS_GPIO_Peri;

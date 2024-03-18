@@ -23,64 +23,50 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include <config.h>
-#include <yss.h>
-#include <cmsis/cmsis_compiler.h>
+#include <drv/peripheral.h>
 
-void initializeSystem(void);
-void initializeSdram(void);
+#if defined(W7500)
 
-void initializeLheap(void);
-void initializeCheap(void);
+#include <drv/Gpio.h>
+#include <yss/reg.h>
+#include <targets/wiznet/bitfield_w7500x.h>
 
-extern uint32_t gCoreClockFrequency;
-extern uint32_t gAhbClockFrequency;
-extern uint32_t gApb1ClockFrequency;
-extern uint32_t gApb2ClockFrequency;
-
-#ifndef DEFAULT_CLOCK_SPEED
-#define DEFAULT_CLOCK_SPEED 1000000
-#endif
-
-extern "C"
+Gpio::Gpio(const Drv::setup_t drvSetup, const setup_t setup) : GpioBase(drvSetup)
 {
-#if defined(CPU_MIMXRT1011DAE5A)
-	void SystemInitHook(void)
-#else
-	void SystemInit(void)
-#endif
-	{
-		// STM32 Cube IDE에서 FPU 초기화에 사용된다.
-#if defined(ST_CUBE_IDE) && (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-		SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
-#endif
-		// 시스템 클럭 및 외부 메모리를 초기화 한다.
-		// 각 MCU마다 initializeSystem() 함수가 정의되어 있다.
-		// 현재 파일의 하위 폴더에 제조사 별로 구분되어 작성되어 있다.
-#if !defined(__MCU_SMALL_SRAM_NO_SCHEDULE) && !defined(ERROR_MCU_NOT_ABLE)
-		initializeSystem();
-#endif
-
-#if YSS_L_HEAP_USE == true
-		// 사용자가 정의한 SDRAM 설정 함수 호출
-		initializeSdram();
-
-		// SDRAM의 Heap 영역 메모리 관리 변수 초기화
-		initializeLheap();
-#endif
-#if YSS_C_HEAP_USE == true
-		// Core Coupled Memory의 Heap 영역 메모리 관리 변수 초기화
-		yss::initializeCheap();
-#endif
-	}
+	mDev = setup.dev;
+	mAfc = setup.afc;
+	mPadcon = setup.padcon;
+	mOutputAf = setup.outputAf;
 }
 
-#if YSS_L_HEAP_USE == true
-void __WEAK initializeSdram(void)
+error Gpio::setAsOutput(uint8_t pin, strength_t strength, otype_t otype)
 {
+	if(pin > 15)
+		return error::PIN_INDEX_OVER;
+	
+	if(strength > 1)
+		return error::WRONG_CONFIG;
+
+	if(otype > 1)
+		return error::WRONG_CONFIG;
+	
+	if(mOutputAf[pin] < 0)
+		return error::THIS_PIN_DO_NOT_HAVE_GPIO_OUTPUT;
+
+	mAfc->REGISTER[pin] = mOutputAf[pin];
+	mPadcon->REGISTER[pin] = (strength & 0x01) << 2 | (otype & 0x01) << 3 | 0x03 << 5;
+	mDev->OUTENSET = 1 << pin;
+
+	return error::ERROR_NONE;
 }
+
+void Gpio::setOutput(uint8_t pin, bool data)
+{
+	if(data)
+		mDev->DATAOUT |= 1 << pin;
+	else
+		mDev->DATAOUT &= ~(1 << pin);		
+}
+
 #endif
 
-void __WEAK initDma(void)
-{
-}
